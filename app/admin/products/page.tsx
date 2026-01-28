@@ -106,7 +106,7 @@ const ProductsPage = () => {
             <h1 className="text-2xl font-bold">Products</h1>
             <p className="text-muted-foreground">Manage your product catalog</p>
           </div>
-          <Link href="/admin/products/new">
+          <Link href="/admin/products/add_product">
             <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
               <Plus className="w-4 h-4 mr-2" />
               Add Product
