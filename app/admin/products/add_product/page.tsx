@@ -34,12 +34,14 @@ const productSchema = z.object({
   price: z.number().min(0),
   categoryId: z.number(),
   isFeatured: z.boolean(),
+  isBest: z.boolean().optional(),
+  isActive: z.boolean(),
   variants: z.array(variantSchema).min(1),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-const categories = [{ id: 1, name: "Fashion" }];
+export const categories = [{ id: 1, name: "Fashion" }];
 
 const CreateProductPage = () => {
   const router = useRouter();
@@ -57,7 +59,7 @@ const CreateProductPage = () => {
       name: "",
       description: "",
       price: 0,
-      categoryId: 1, // 👈 default Fashion
+      categoryId: 0, // 👈 default Fashion
       isFeatured: false,
       variants: [{ size: "", color: "", price: 0, stock: 0 }],
     },
@@ -75,6 +77,8 @@ const CreateProductPage = () => {
         description: data.description,
         price: data.price,
         categoryId: data.categoryId,
+        isActive: data.isActive,
+        isBest: data?.isBest || undefined,
         isFeatured: data.isFeatured,
         variants: data.variants.map((v) => ({
           size: v.size,
@@ -233,8 +237,8 @@ const CreateProductPage = () => {
                     </div>
                   )}
                 />
-
-                {/* <Controller
+                {/* 
+                <Controller
                   name="isBest"
                   control={control}
                   render={({ field }) => (
@@ -252,7 +256,7 @@ const CreateProductPage = () => {
                       />
                     </div>
                   )}
-                />
+                /> */}
 
                 <Controller
                   name="isActive"
@@ -272,7 +276,7 @@ const CreateProductPage = () => {
                       />
                     </div>
                   )}
-                /> */}
+                />
               </div>
             </div>
           </FadeIn>

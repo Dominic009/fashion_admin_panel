@@ -28,9 +28,19 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Don't force a redirect when the failing request is the login request
+      const requestUrl: string | undefined = error.config?.url;
+      const isLoginRequest = requestUrl?.includes("/auth/admin/login");
+
       localStorage.removeItem("admin_token");
       localStorage.removeItem("admin_user");
-      window.location.href = "/admin/login";
+
+      // If this was the login request or the user is already on the login page,
+      // don't programmatically redirect — let the calling code handle the error
+      // (e.g. show a toast). Only redirect for 401s originating from other pages.
+      if (!isLoginRequest && window.location.pathname !== "/admin/login") {
+        window.location.href = "/admin/login";
+      }
     }
     return Promise.reject(error);
   },
@@ -64,7 +74,7 @@ export const productsApi = {
     return response.data;
   },
   update: async (id: string, data: UpdateProductInput): Promise<Product> => {
-    const response = await api.put(`/products/${id}`, data);
+    const response = await api.patch(`/products/${id}`, data);
     return response.data;
   },
   patch: async (

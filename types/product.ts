@@ -1,5 +1,4 @@
 export interface ProductVariant {
-  id: string;
   size: string;
   color: string;
   price: number;
@@ -11,7 +10,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  category: string;
+  categoryId: number;
   isFeatured: boolean;
   isBest: boolean;
   isActive: boolean;
@@ -24,10 +23,10 @@ export interface CreateProductInput {
   name: string;
   description: string;
   price: number;
-  categoryId: number;
+  categoryId: number | string;
   isFeatured: boolean;
-  // isBest: boolean;
-  // isActive: boolean;
+  isBest: boolean;
+  isActive: boolean;
   variants: Omit<ProductVariant, 'id'>[];
 }
 

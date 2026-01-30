@@ -50,13 +50,14 @@ import { StatusBadge } from "@/components/ui/badge-status";
 import { TableSkeleton } from "@/components/ui/skeleton-card";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { categories } from "./add_product/page";
 
-const categories = ["All", "Electronics", "Clothing", "Accessories", "Sports"];
 
 const ProductsPage = () => {
   const { products, isLoading, deleteProduct } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState<number | "all">("all");
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const { toast } = useToast();
@@ -67,7 +68,8 @@ const ProductsPage = () => {
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
       const matchesCategory =
-        categoryFilter === "All" || product.category === categoryFilter;
+        categoryFilter === "all" || product.categoryId === categoryFilter;
+
       return matchesSearch && matchesCategory;
     });
   }, [products, searchQuery, categoryFilter]);
@@ -97,6 +99,13 @@ const ProductsPage = () => {
     setProductToDelete(null);
   };
 
+  const categoryMap = useMemo(() => {
+    return Object.fromEntries(
+      categories.map((cat) => [cat.id, cat.name])
+    );
+  }, []);
+
+
   return (
     <PageTransition>
       <div className="space-y-6">
@@ -125,17 +134,24 @@ const ProductsPage = () => {
               className="pl-10"
             />
           </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <Select
+            value={String(categoryFilter)}
+            onValueChange={(value) =>
+              setCategoryFilter(value === "all" ? "all" : Number(value))
+            }
+          >
+
             <SelectTrigger className="w-[180px]">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
               {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
+                <SelectItem key={cat.id} value={String(cat.id)}>
+                  {cat.name}
                 </SelectItem>
               ))}
+
             </SelectContent>
           </Select>
         </FadeIn>
@@ -207,9 +223,10 @@ const ProductsPage = () => {
                         </TableCell>
                         <TableCell>
                           <span className="text-sm">
-                            {product.category?.name}
+                            {categoryMap[product.categoryId] ?? "Unknown"}
                           </span>
                         </TableCell>
+
                         <TableCell>
                           <span className="font-medium">
                             ${product.price.toFixed(2)}
@@ -236,7 +253,7 @@ const ProductsPage = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <Link href={`/admin/products/${product.id}/edit`}>
+                              <Link href={`/admin/products/edit_product/${product.id}`}>
                                 <DropdownMenuItem>
                                   <Edit className="w-4 h-4 mr-2" />
                                   Edit
